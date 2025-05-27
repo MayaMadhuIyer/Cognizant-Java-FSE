@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Local Community Event Portal</title>
+  <style>
+    /* Internal CSS for welcome banner */
+    #welcomeBanner {
+      background-color: #f047af;
+      color: rgb(247, 166, 166);
+      padding: 15px;
+      font-size: 1.5em;
+      margin-bottom: 20px;
+    }
+    .highlight {
+      background-color: rgb(205, 92, 171);
+      font-weight: bold;
+    }
+    /* Image gallery */
+    .event-img {
+      border: 3px solid #444;
+      width: 150px;
+      height: 100px;
+      object-fit: cover;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .event-img.enlarged {
+      transform: scale(2);
+      z-index: 1000;
+      position: relative;
+    }
+    table {
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+    td {
+      padding: 10px;
+      text-align: center;
+      vertical-align: top;
+    }
+    /* Form styling */
+    form {
+      max-width: 400px;
+      padding: 15px;
+      border: 1px solid #faafaf;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+    input, select, textarea, output {
+      width: 100%;
+      padding: 7px;
+      box-sizing: border-box;
+      font-size: 1em;
+    }
+    button, input[type="submit"] {
+      margin-top: 15px;
+      padding: 10px 15px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    /* Confirmation message */
+    #confirmationMessage {
+      margin-top: 15px;
+      color: rgb(128, 0, 102);
+      font-weight: bold;
+    }
+    /* Video section */
+    #videoMessage {
+      margin-top: 10px;
+      font-style: italic;
+      color: #555;
+    }
+    /* Preferences clear button */
+    #clearPrefs {
+      margin-top: 10px;
+      background-color: #dc3545;
+      color: rgb(244, 197, 197);
+      border: none;
+      border-radius: 5px;
+    }
+    /* Coordinates display */
+    #coordsDisplay, #geoError {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav>
+    <a href="#home">Home</a> | 
+    <a href="#events">Events</a> | 
+    <a href="#contact">Contact</a> | 
+    <a href="help.html" target="_blank">Help</a>
+  </nav>
+
+  <!-- Main -->
+  <main>
+    <!-- Welcome Banner -->
+    <div id="welcomeBanner">
+      Welcome back, <span class="highlight">Community Member</span>! <span style="color:red; font-weight:bold;">Special Offer: Free entry to our next event!</span>
+    </div>
+
+    <!-- Home Section -->
+    <section id="home">
+      <h2>Home</h2>
+      <p>Welcome to the Local Community Event Portal. Stay connected with all upcoming events and services!</p>
+    </section>
+
+    <!-- Events Section -->
+    <section id="events">
+      <h2>Events</h2>
+      <!-- Image Gallery -->
+      <table>
+        <tr>
+          <td><img src="https://via.placeholder.com/150x100?text=Event+1" alt="Community Picnic" title="Community Picnic" class="event-img" ondblclick="toggleEnlarge(this)" /><br/>Community Picnic</td>
+          <td><img src="https://via.placeholder.com/150x100?text=Event+2" alt="Art Workshop" title="Art Workshop" class="event-img" ondblclick="toggleEnlarge(this)" /><br/>Art Workshop</td>
+          <td><img src="https://via.placeholder.com/150x100?text=Event+3" alt="Music Festival" title="Music Festival" class="event-img" ondblclick="toggleEnlarge(this)" /><br/>Music Festival</td>
+        </tr>
+        <tr>
+          <td><img src="https://via.placeholder.com/150x100?text=Event+4" alt="Charity Run" title="Charity Run" class="event-img" ondblclick="toggleEnlarge(this)" /><br/>Charity Run</td>
+          <td><img src="https://via.placeholder.com/150x100?text=Event+5" alt="Book Fair" title="Book Fair" class="event-img" ondblclick="toggleEnlarge(this)" /><br/>Book Fair</td>
+          <td><img src="https://via.placeholder.com/150x100?text=Event+6" alt="Food Festival" title="Food Festival" class="event-img" ondblclick="toggleEnlarge(this)" /><br/>Food Festival</td>
+        </tr>
+      </table>
+
+      <!-- Registration Form -->
+      <form id="registrationForm" onsubmit="return handleSubmit(event)">
+        <h3>Event Registration</h3>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" placeholder="Your full name" required autofocus />
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" placeholder="name@example.com" required />
+
+        <label for="date">Event Date:</label>
+        <input type="date" id="date" name="date" required />
+
+        <label for="eventType">Event Type:</label>
+        <select id="eventType" name="eventType" onchange="showFee()" required>
+          <option value="">Select event type</option>
+          <option value="picnic">Community Picnic</option>
+          <option value="workshop">Art Workshop</option>
+          <option value="festival">Music Festival</option>
+        </select>
+
+        <div id="eventFee" style="margin: 5px 0; font-weight: bold;"></div>
+
+        <label for="phone">Phone Number:</label>
+        <input type="tel" id="phone" name="phone" placeholder="+1234567890" onblur="validatePhone()" />
+
+        <label for="message">Additional Message:</label>
+        <textarea id="message" name="message" rows="4" onkeyup="countChars()" placeholder="Your message here..."></textarea>
+        <div>Characters typed: <output id="charCount">0</output></div>
+
+        <input type="submit" value="Register" onclick="showConfirmation()" />
+        <div id="confirmationMessage" role="alert"></div>
+      </form>
+
+      <!-- Clear Preferences Button -->
+      <button id="clearPrefs" onclick="clearPreferences()">Clear Preferences</button>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+      <h2>Contact</h2>
+      <p>For any questions, contact us at <a href="mailto:community@localcity.gov">community@localcity.gov</a>.</p>
+      <!-- Geolocation Button -->
+      <button onclick="findNearbyEvents()">Find Nearby Events</button>
+      <div id="coordsDisplay"></div>
+      <div id="geoError" style="color:red;"></div>
+    </section>
+
+    <!-- Video Section -->
+    <section id="videoSection">
+      <h2>Event Promo Video</h2>
+      <video id="promoVideo" width="320" height="240" controls oncanplay="videoReady()">
+        <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm" type="video/webm" />
+        Your browser does not support the video tag.
+      </video>
+      <div id="videoMessage"></div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 CTS GENC TECHNICAL ROUND</p>
+  </footer>
+
+  <script>
+    // Exercise 6 - Event Handling
+
+    // Validate phone number on blur
+    function validatePhone() {
+      const phoneInput = document.getElementById('phone');
+      const phone = phoneInput.value.trim();
+      const confirmationMessage = document.getElementById('confirmationMessage');
+
+      // Simple regex for phone validation (international format optional)
+      const phoneRegex = /^\+?\d{7,15}$/;
+      if (phone && !phoneRegex.test(phone)) {
+        alert("Please enter a valid phone number (+1234567890 format).");
+        phoneInput.focus();
+        return false;
+      }
+      return true;
+    }
+
+    // Show event fee on change
+    function showFee() {
+      const eventType = document.getElementById('eventType').value;
+      const feeDisplay = document.getElementById('eventFee');
+      let feeText = '';
+      switch(eventType) {
+        case 'picnic': feeText = 'Fee: Free'; break;
+        case 'workshop': feeText = 'Fee: $20'; break;
+        case 'festival': feeText = 'Fee: $50'; break;
+        default: feeText = ''; break;
+      }
+      feeDisplay.textContent = feeText;
+
+      // Save preference to localStorage (Exercise 8)
+      if (eventType) {
+        localStorage.setItem('preferredEventType', eventType);
+      }
+    }
+
+    // Show confirmation on submit button click
+    function showConfirmation() {
+      const confirmation = document.getElementById('confirmationMessage');
+      confirmation.textContent = "Thank you for registering!";
+    }
+
+    // Toggle enlarge image on double click
+    function toggleEnlarge(img) {
+      img.classList.toggle('enlarged');
+    }
+
+    // Count characters typed in message textarea
+    function countChars() {
+      const message = document.getElementById('message').value;
+      document.getElementById('charCount').textContent = message.length;
+    }
+
+    // Handle form submit
+    function handleSubmit(event) {
+      event.preventDefault();
+
+      if (!validatePhone()) {
+        return false;
+      }
+
+      const form = event.target;
+      const name = form.name.value.trim();
+      const email = form.email.value.trim();
+      const date = form.date.value;
+      const eventType = form.eventType.value;
+      const message = form.message.value.trim();
+
+      // Save preferences (Exercise 8)
+      localStorage.setItem('registeredName', name);
+      localStorage.setItem('registeredEmail', email);
+      localStorage.setItem('registeredDate', date);
+      localStorage.setItem('registeredEventType', eventType);
+      localStorage.setItem('registeredMessage', message);
+
+      // Display confirmation message
+      const confirmation = document.getElementById('confirmationMessage');
+      confirmation.textContent = `Thanks for registering, ${name}! We have received your registration for the ${eventType} on ${date}.`;
+
+      // Reset form after confirmation
+      form.reset();
+      document.getElementById('charCount').textContent = '0';
+      document.getElementById('eventFee').textContent = '';
+
+      return false;
+    }
+
+    // Exercise 7 - Video Event Handling
+    function videoReady() {
+      document.getElementById('videoMessage').textContent = "Video is ready to play.";
+    }
+
+    // Exercise 8 - Local Storage
+
+    // On page load, restore preferred event type if saved
+    window.onload = function() {
+      const preferredEventType = localStorage.getItem('preferredEventType');
+      if (preferredEventType) {
+        const select = document.getElementById('eventType');
+        select.value = preferredEventType;
+        showFee();
+      }
+      // Restore saved registration name & email if available (optional)
+      const savedName = localStorage.getItem('registeredName');
+      const savedEmail = localStorage.getItem('registeredEmail');
+      if (savedName) document.getElementById('name').value = savedName;
+      if (savedEmail) document.getElementById('email').value = savedEmail;
+    };
+
+    // Clear preferences
+    function clearPreferences() {
+      localStorage.clear();
+      alert("All preferences cleared!");
+      // Reset form
+      document.getElementById('registrationForm').reset();
+      document.getElementById('charCount').textContent = '0';
+      document.getElementById('eventFee').textContent = '';
+      document.getElementById('confirmationMessage').textContent = '';
+    }
+
+    // Exercise 9 - Geolocation
+
+    function findNearbyEvents() {
+      const coordsDisplay = document.getElementById('coordsDisplay');
+      const geoError = document.getElementById('geoError');
+
+      coordsDisplay.textContent = '';
+      geoError.textContent = '';
+
+      if (!navigator.geolocation) {
+        geoError.textContent = "Geolocation is not supported by your browser.";
+        return;
+      }
+
+      function success(position) {
+        const latitude = position.coords.latitude.toFixed(4);
+        const longitude = position.coords.longitude.toFixed(4);
+        coordsDisplay.textContent = `Your location: Latitude ${latitude}, Longitude ${longitude}. Looking for events near you...`;
+        // Here you could call an API or filter events based on location
+      }
+
+      function error() {
+        geoError.textContent = "Unable to retrieve your location.";
+      }
+
+      navigator.geolocation.getCurrentPosition(success, error);
+    }
+  </script>
+</body>
+</html>
